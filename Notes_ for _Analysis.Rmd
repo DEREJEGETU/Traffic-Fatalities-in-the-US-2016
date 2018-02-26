@@ -1,0 +1,363 @@
+---
+title: "Notes Analysis"
+author: "DEREJE GETU DEMISSIE"
+date: "February 17, 2018"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Notes:
+
+* Changing the class of the variables  and recoding is necessary 
+
+* Summarising them and see the pattern and If necessary , recode them. 
+
+* From the Vehicle data, Number of Occupants can be an interesting 
+
+* Drivers BMI and fatal accdients from the vehicle data 
+
+* Drivers with previous records (mutate previous records)
+
+* % drinking Drivers per state
+
+* % Speeding Drivers per State 
+
+* Fatal Crash Injury specifying color by feading... like from very red to light red
+
+## Data Cleanining Process
+
+* Check for missing data: observations with missing data will be removed for this visualization.
+
+* Converted the date and time columns from strings to their respective classes so that we can compare them as actual dates and times instead of strings. Now that we have a proper date value, we can create another column for days of the week. The data provides us with the vehicle types that are involved in each accident. This is good, but they are split up in each of their own columns depending on the number of vehicles.
+
+## Visualizations
+
+* Count of fatalities by the top five and bottom  five states (Histogram)
+
+* What about accidents by days of the week? Histogram by the days of the week (for all states/)
+
+* visualize these accidents on a map via longitude and latitude coordinates from the dataset.
+  + This might give us a busy visualization thus, making interactive to show for each State will solve the big problem (Hit Maps )
+  + visualizing by days or visualizing by month might help to clear the busy visualization
+  
+* visualizing the data by the time of the day [link](https://nycdatascience.com/blog/student-works/r-visualization/interactive-visualizations-nyc-traffic-accidents-r-shiny/)
+
+* Accident density based on the month of the year.
+
+* Accidents mapped mapped on top of a map of states( make the interactivity works for all)
+
+* Visualization depicting the type of the vehicles involved in the accidents [link](https://www.r-bloggers.com/motor-vehicle-collisions-in-new-york-city-r-shiny-data-visualization/)
+
+* Check [link](https://github.com/pchuck/denver-traffic/blob/master/traffic.md#all-accidents-by-time) has important codes for analysis 
+Neighborhoods with the most accidents
+
+  
+## The 2007-2016 FARS Auxiliary Datasets guide
+
+### Accident File 
+ *ST_CASE is the unique case identifier for each record*
+* Crash Injury Type 
+    + Fatal Crash(FARS)
+  
+* *Crash Type (A_CT)*
+    + Single Vehicle Crash
+    + Two Vechile Crash
+    + More Than Two-Vehicle Crash
+    
+* *Age(A_Age)*
+    + A_D0-15
+    + A_D16-24
+    + A_D25-64
+    + A_65PLS
+    
+* *Involving a Distracted Driver (A_DIST)*
+    + Involving a Distracted Driver
+    + Other Crash
+    
+* *Day of Week (A_DOW)*
+    + Weekday
+    + Weekend
+    + Unknown
+
+* *Time of Day(A_TOD)*
+    + Daytime
+    + Nighttime
+    + Unknown
+    
+* Involving a Drowsy Driver(A_DROWSY)
+    + Involving a Drowsy Driver
+    + Other Crash
+
+* Involving a Hit and Run (A_HR)
+    + Yes_Hit and Run
+    + No_Hit and Run
+    
+* Interstate (A_INTER)
+    + Interstate
+    + Non Interstate
+    + Unknown
+    
+* Intersection (A_INTSEC)
+    + Intersection
+    + Non-Intersection
+    + Unknown
+    
+* Involving a Large Truck (A_LT)
+    + Involving a Large Truck
+    + Other Crash
+    
+* Manner of Collision (A_MANCOL)
+    + Not Collision with Motor Vehicle in Transport
+    + Rear-End
+    + Head-On
+    + Angle
+    + Sideswipe
+    + Other
+    + Unknown
+    
+* Involving a Motorcyclek (A_MC)
+    + Motorcycle Involved Crash
+    + Other Crash
+    
+* Involving a Pedestrian (A_PED)
+    + Involving Pedestrian Involved Crash
+    + Other Crash
+    
+* Involving a Pedalcyclist (A_PEDAL)
+    + Pedalcyclist Involved Crash
+    + Other Crash
+    
+* Involving a Police Pursuit (A_POLPUR)
+    + Police Pursuit Involved Crash
+    + Other Crash
+    
+* Involving a Driver With Positive BAC (A_POSBAC)
+    + Driver With Positive BAC Testing Crash
+    + All Drivers With ZERO BAC Testing Crash
+    + Unknown BAC Crash
+  
+* Involving a Roadway Departure (A_RD)
+    + Yes - Roadway Departure
+    + No - Roadway Departure
+    
+* NHTSA Region (A_REGION)
+    + 1 = CT, ME, MA, NH, RI, VT
+    + 2 = NJ, NY, PA, PR
+    + 3 = DE, DC, KY, MD, NC, VA, WV
+    + 4 = AL, FL, GA, SC, TN
+    + 5 = IL, IN, MI, MN, OH, WI
+    + 6 = LA, MS, NM, OK, TX
+    + 7 = AR, IA, KS, NE, MO
+    + 8 = CO, NV, ND, SD, WY, UT
+    + 9 = AZ, CA, HI
+    + 10 = AK, ID, MT, OR, WA
+    
+*  Relationship to the Road (A_RELRD)
+    + On Roadway
+    + Off Roadway/Shoulder
+    + Off Roadway/Median
+    + Off Roadway/Other
+    + Off Roadway (no other details)
+    + Other/Unknown
+    
+*  Roadway Function Class(A_ROADFC)
+    + Interstate, principal arterial 
+    + Freeway and expressway, principal arterial
+    + Principal arterial, other
+    + Minor arterial
+    + Collector
+    + Local
+    + Unknown
+
+* Involving a Rollover(A_ROLL)
+    + Rollover Involved Crash
+    + Other Crash
+    
+* Rural/Urban(A_RU)
+    + Rural
+    + Urban
+    + Unknown
+    
+* *Involving Speeding(A_SPCRA)*
+    + Speeding Involved Crash
+    + Other Crash
+    
+
+### Vehicle Data
+
+* Vehicle Body Type (A_BODY)
+    + Passenger Car
+    + Light Truck - Pickup
+    + Light Truck - Utility
+    + Light Truck - Van
+    + Light Truck - Other
+    + Large Truck
+    + Motorcycle
+    + Bus
+    + Other/Unknown
+
+* CDL Status(A_CDL_S)
+    + Valid
+    + Invalid
+    + Unknown
+    + Not Applicable
+    
+* Distracted Driver (A_DRDIS)
+    + Yes-Distracted Driver
+    + Other
+    
+* Drowsy Driver(A_DRDRO)
+    + Yes-Drowsy Driver
+    + Other 
+    
+* License Compliance(A_LIC_C)
+    + Valid
+    + Invalid
+    + Unknown
+    + Not Applicable
+    
+* License Status(A_LIC_S)
+    + Valid
+    + Invalid
+    + Unknown
+    + Not Applicable
+    
+* Motorcycle License Status(A_MC_L_S)
+    + Valid
+    + Invalid
+    + Unknown
+    + Not Applicable
+    
+* Speeding Vehicle(A_SPVEH)
+    + Speed Involved
+    + No Speed Involved
+    + Unknown
+    + Not Applicable
+    
+* Alcohol Testing(A_ALCTES)
+    + No Alcohol
+    + Positive BAC
+    + Not Tested
+    + Tested, with Unknown Results
+    + Unknown if Tested
+    
+* Race and Hispanic - Using OMB Guidelines (A_HRACE)
+    + Not Applicable or Not Available
+    + Hispanic
+    + White Non-Hispanic
+    + Black, Non-Hispanic
+    + American Indian, Non-Hispanic/Unknown
+    + Asian, Non-Hispanic/Unknown
+    + Pacific Islander, Non-Hispanic/Unknown
+    + Multiple Races, Non-Hispanic/Unknown
+    + All Other Non-Hispanic or Race
+    + Unknown Race and Unknown Hispanic
+    
+* The PERSON Data File
+The Person data file includes motorist and non-motorist data. It contains the data elements
+ST_CASE, STATE, VEH_NO, and PER_NO, which are described in the beginning of the Data
+Element Definitions and Codes section. The Person data file also contains the data elements
+on the following pages.
+ST_CASE, VEH_NO, and PER_NO are the unique identifiers for each record. ST_CASE
+should be used to merge the Person data file with the Accident data file for a set of all motorists
+and non-motorists. ST_CASE and VEH_NO should be used to merge the Person data file with
+the Vehicle and Parkwork data files for a set of all motor vehicle occupants. ST_CASE and
+PER_NO should be used to merge the Person data file with non-motorist person-level data files.
+In the Person data file, motor vehicle occupants are PER_TYPE = 1, 2, 3, 9. Motor vehicle
+occupants have assigned vehicle numbers starting with 1. When PER_TYPE = 3, the occupied
+vehicle will be found in the PARKWORK data file. Non-motor vehicle occupants are
+PER_TYPE = 4, 5, 6, 7, 8, 10 or 19. VEH_NO = 0 for non-motor vehicle occupants.
+
+* The VEHICLE Data File
+The Vehicle data file includes in-transport motor vehicle data as well as driver and precrash
+data. It contains the data elements ST_CASE, STATE, and VEH_NO, which are described in
+the beginning of the Data Element Definitions and Codes section. The Vehicle data file also
+contains the data elements on the following pages.
+ST_CASE and VEH_NO are the unique identifiers for each record. ST_CASE should be used
+to merge the Vehicle data file with the Accident data file. ST_CASE and VEH_NO should be
+used to merge the Vehicle data file with other vehicle-level data files and the Person data file.
+
+* The DISTRACT Data File
+The Distract data file identifies each driver distraction (as a separate record). It contains the
+data elements ST_CASE, STATE, and VEH_NO, which are described in the beginning of the
+Data Element Definitions and Codes section. The data file also contains MDRDSTRD which is
+described below.
+ST_CASE, VEH_NO, and MDRDSTRD are the unique identifiers for each record. ST_CASE
+and VEH_NO should be used to merge the Distract data file with drivers from the Vehicle data
+file.
+
+# Data Cleaning 
+ * Set the working directory 
+```{r}
+"C:/Users/Dereje/NSSDS/Testing/Traffic-Fatalities-in-the-US-2016"
+```
+
+## Loading Packages 
+
+```{r message=FALSE}
+library(shiny)
+library(shinythemes)
+library(readr)
+library(ggplot2)
+library(stringr)
+library(tidyverse)
+library(dplyr)
+library(magrittr)
+library(DT)
+library(tools)
+```
+
+## Importing Data Sets 
+```{r}
+Distract <- read_csv("Data/Distract.csv")
+accident <- read_csv("Data/accident.csv")
+person <- read_csv("Data/person.csv")
+vehicle <- read_csv("Data/vehicle.csv")
+```
+
+# Merging Vehicle data with Distract data set to capture distraction
+```{r}
+vehicle_distract<-vehicle%>%
+  inner_join(Distract, by="ST_CASE","VEH_NO")
+```
+
+
+# Nameing columns 
+```{r}
+acc_name<-c("STATE", "ST_CASE", "PERSONS", "COUNTY","CITY","DAY","MONTH","YEAR","DAY_WEEK",
+"HOUR", "MINUTE","NHS","RUR_URB", "LATITUDE", "LONGITUD","LGT_COND", "WEATHER1","WEATHER2",   "WEATHER","CF1", "CF2", "CF3", "FATALS", "DRUNK_DR", "FUNC_SYS")
+
+per_name<-c("ST_CASE","AGE","SEX","RACE","REST_MIS","DSTATUS","PER_TYP" ,"REST_USE", "AIR_BAG")
+
+vehc_name<-c("ST_CASE","UNITTYPE","HIT_RUN","BODY_TYP","MAKE","TRAV_SP","L_STATE","L_STATUS","DR_HGT","DR_WGT","PREV_ACC","PREV_SUS", "PREV_DWI","PREV_SPD","PREV_OTH","SPEEDREL", "DR_SF1","DR_SF2","DR_SF3","DR_SF4","DR_DRINK","MDRDSTRD")
+```
+
+# Subsetting the data set with the variables of interest 
+```{r}
+accident_2016<-accident %>% 
+  select(acc_name)
+
+vehicle_2016<-vehicle_distract %>%
+  select(vehc_name)
+
+person_2016<-person %>%
+  select(per_name)
+  
+```
+
+# merging The data sets in to one master fatality data set 
+```{r}
+fatality_2016<-accident_2016 %>%
+  inner_join(vehicle_2016, by="ST_CASE")
+
+fatality_2016<-fatality_2016 %>%
+  inner_join(person_2016, by="ST_CASE")
+```
+
+
+
+
+ 
