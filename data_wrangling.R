@@ -18,6 +18,9 @@ library(magrittr)
 library(DT)
 library(tools)
 library(labelled)
+library(plyr)
+library(maps)
+
 
 
 ## Importing Data Sets 
@@ -30,11 +33,10 @@ vehicle <- read_csv("Data/vehicle.csv")
 
 # Nameing columns 
 
-acc_name<-c("STATE", "ST_CASE", "PERSONS", "COUNTY","CITY","DAY","MONTH","YEAR","DAY_WEEK",
+acc_name<-c("STATE", "ST_CASE", "PERSONS","DAY","MONTH","YEAR","DAY_WEEK",
             "HOUR", "MINUTE","NHS","RUR_URB", "LATITUDE", "LONGITUD","LGT_COND", "WEATHER", "FATALS", "FUNC_SYS")
 
-per_name<-c("ST_CASE","VEH_NO","AGE","SEX","RACE","REST_MIS","PER_TYP" ,"REST_USE")
-
+per_name<-c("ST_CASE","VEH_NO","AGE","SEX","RACE","REST_MIS","PER_TYP")
 vehc_name<-c("ST_CASE","DEATHS","VEH_NO","UNITTYPE","HIT_RUN","BODY_TYP","MAKE","TRAV_SP","L_STATE","L_STATUS","DR_HGT","DR_WGT","SPEEDREL","DR_DRINK")
 
 dis_name<-c("ST_CASE", "VEH_NO", "MDRDSTRD")
@@ -263,13 +265,69 @@ fatality_df$Land_Use[fatality_df$Land_Use=="Not Reported"] <- NA
 fatality_df$Land_Use[fatality_df$Land_Use=="Unknown"] <- NA
 fatality_df$Land_Use[fatality_df$Land_Use=="Trafficway Not in State Inventory"] <- NA
 
-
-
-
 # Hour and Minutes 
 fatality_df$HOUR[fatality_df$HOUR==99] <- NA
 fatality_df$MINUTE[fatality_df$MINUTE==99] <- NA
 
+
+# SPEED Related
+library(plyr)
+fatality_df$SPEED_INVOLVED <- revalue(fatality_df$SPEEDREL, c("No"="No", "Yes_Racing"="Yes","Yes, Exceeded Speed Limit"="Yes",
+                                                              "Yes, Too Fast for Conditions"="Yes","Yes, Specifics Unknown"="Yes", 
+                                                              "No Driver Present"="No Driver Present","Unknown"="Unknown"))
+
+# LicenseStatus
+
+fatality_df$LICENSE_STATUS<-revalue(fatality_df$L_STATUS,c("Valid License"="Valid License","Not Licensed"="Invalid License","Suspended"="Invalid License",
+                                                           "Revoked"="Invalid License","Expired"="Invalid License","Cancelled or Denied"="Invalid License", 
+                                                           "No Driver Present"="No Driver Present","Unknown License Status"="Unknown License Status"))
+
+# WEATHER
+fatality_df$WEATHER_CONDITION<-revalue(fatality_df$WEATHER,c("Clear"="Clear","No Additional Atmospheric Conditions"="Clear", "Rain"="Bad Weather","Sleet_Hail"="Bad Weather",
+                                                             "Snow"="Bad Weather","Fog_Smog_Smoke"="Bad Weather","Severe Crosswinds"="Bad Weather", 
+                                                             "Blowing Sand_Soil_Dirt"="Bad Weather","Other"="Bad Weather","Cloudy"="Bad Weather","Blowing Snow"="Bad Weather",
+                                                             "Freezing Rain or Drizzle"="Bad Weather","Not Reported"="NA","Unknown"="Unknown"))
+
+fatality_df$DISTRACTED<-revalue(fatality_df$MDRDSTRD, c("Not Distracted"="Not Distracted","Unknown if Distracted"="Unknown",
+                                                        "While Using or Reaching For Device/Object Brought Into Vehicle"="Other Distraction",
+                                                        "Distraction (Distracted)Details Unknown"="Other Distraction","Other Cellular Phone Related"="Cellular Phone Related",
+                                                        "While Manipulating Cellular Phone"="Cellular Phone Related","Looked But Did Not See"="Other Distraction",
+                                                        "Not Reported"="Unknown","Smoking Related"="Other Distraction","While Adjusting Audio or Climate Controls"="Other Distraction",
+                                                       "Eating or Drinking"="Other Distraction","By Other Occupant(s)"="Other Distraction","Other Distraction"=" Other Distraction",
+                                                      "Distracted by Outside Person, Object or Event"="Other Distraction","Careless/Inattentive"="Other Distraction",
+                                                      "Distraction/Inattention"="Other Distraction","Inattention (Inattentive), Details Unknown"="Other Distraction","While Talking or Listening to Cellular Phone"="Cellular Phone Related",
+                                                      "While Using Other Component/Controls Integral to Vehicle"="Other Distraction","Lost In Thought/Day Dreaming"="Other Distraction",
+                                                     "Distraction/Careless"="Other Distraction","By a Moving Object in Vehicle"="Other Distraction", "No Driver Present/Unknown if Driver Present"="Other Distraction",
+                                                     "Other Distraction "="Other Distraction"))
+
+fatality_df$long<-fatality_df$LONGITUD
+
+fatality_df$long[fatality_df$long==999.9999] <- NA
+fatality_df$long[fatality_df$long==888.88880] <- NA
+fatality_df$long[fatality_df$long==777.77770] <- NA
+
+
+fatality_df$lat<-fatality_df$LATITUDE
+fatality_df$lat[fatality_df$lat==99.9999] <- NA
+fatality_df$lat[fatality_df$lat==88.88880] <- NA
+fatality_df$lat[fatality_df$lat==77.77770] <- NA
+
+
+# BMI
+fatality_df<-mutate(fatality_df, BMI=round(DR_WGT /(DR_HGT)**2 * 703))
+
+# 
+
+fatality_df<-fatality_df %>% 
+  select(-c(PERSONS,LGT_COND,UNITTYPE,long,lat,MAKE,BODY_TYP))
+
+
+
+
+
+
+ggplot(fatality_df,aes(x=long, y=lat))+
+  geom_point()
 
 #na_values(fatality_df$Land_Use)
 fatality_df %>%
@@ -277,26 +335,39 @@ fatality_df %>%
   summarise(sum(FATALS)) %>% 
   arrange(desc(`sum(FATALS)`))
 
-ungroup()
 
 
 fatality_df %>% 
   count(STATE) %>% 
   arrange(desc(n))
 
+
+ggplot(fatality_df) + geom_bar(aes(x=WEATHER_CONDITION)) +
+  scale_x_discrete(limits = (fatality_df %>% count(WEATHER_CONDITION)
+                             %>% arrange(n))$WEATHER_CONDITION) +
+  labs(title="Number of Accidents by STATE",
+       x="STATE", y="Count") +
+  coord_flip()
+
 # Accidents by GENDER, AGE_CATAGORY, DRINK, SPEEDREL, Land_Use, HIT_RUN
 ggplot(fatality_df) + geom_bar(aes(x=STATE, fill=GENDER)) +
-  scale_x_discrete(limits = (fatality_df %>% count(STATE)
-                             %>% arrange(n))$STATE) +
+  scale_x_discrete(limits = (fatality_df %>% 
+                               count(STATE)%>%                   
+                               arrange(n))$STATE) +
   coord_flip() +
   labs(title="Accidents by STATE and GENDER",
        x="STATE", y="Count", fill="GENDER")
 
+fat_df<-fatality_df %>% 
+  group_by(ST_CASE,STATE)
+ggplot(data=subset(fatality_df %>% group_by(STATE,ST_CASE),!is.na(GENDER))) + geom_bar(aes(x=STATE,fill=GENDER))+
+  coord_flip()
+
 # Number of Accidents by Licese Status and fill by any category that I want 
-ggplot(fatality_df) + geom_bar(aes(x=L_STATUS, fill=GENDER)) +
-  scale_x_discrete(limits = (fatality_df %>% count(L_STATUS)
+ggplot(fatality_df_V1) + geom_bar(aes(x=L_STATUS, fill=GENDER)) +
+  scale_x_discrete(limits = (fatality_df_V1 %>% count(L_STATUS)
                              %>% arrange(n))$L_STATUS) +
-  labs(title="Number of Accidents by Offense Type",
+  labs(title="Number of Accidents",
        x="Offense Type", y="Count") +
   coord_flip()
 
@@ -304,11 +375,71 @@ ggplot(fatality_df) + geom_bar(aes(x=L_STATUS, fill=GENDER)) +
 ggplot(fatality_df) + geom_bar(aes(x=HOUR, fill=DR_DRINK)) 
   
 
+### Accidents by Time 
+
+g1 <- ggplot(data=fatality_df, aes(fatality_df$HOUR, na.rm=TRUE)) +
+  geom_histogram(breaks=seq(0, 24, by=1), col="#e2240f",
+                 fill="#ffff88", alpha=0.4) + 
+  labs(x="Hour of Day", y="Number of Accidents")
+
+g2 <- ggplot(data=fatality_df, aes(fatality_df$DAY_WEEK)) +
+  geom_histogram(breaks=seq(0, 7, by=1), col="yellow",
+                 fill="#e2240f", alpha=0.4) + 
+  labs(x="Day of Week (Sun-Sat)")
+
+g3 <- ggplot(data=fatality_df, aes(fatality_df$MONTH)) +
+  geom_histogram(breaks=seq(0, 12, by=1), col="yellow",
+                 fill="#e2240f", alpha=0.4) + 
+  labs(x="Month (Jan-Dec)")
+
+
+
+grid.arrange(g1, g2, g3, nrow=2)
+
+#WEATHER_CONDITION
+
+ggplot(DC) + geom_bar(aes(x=STATE, fill=AGE_GROUP)) +
+  scale_x_discrete(limits = (DC %>% count(STATE)
+                             %>% arrange(n))$STATE) +
+  coord_flip() 
+
+ggplot(fatality_df) + geom_bar(aes(x=STATE, fill=AGE_GROUP)) +
+  scale_x_discrete(limits = (fatality_df %>% count(STATE)
+                             %>% arrange(n))$STATE) +
+  coord_flip() +
+  labs(title="Number of Accidents by Weather condition",
+       x="Weather condition", y="Count")
 
 library(ggmap)
 library(gridExtra)
 
-denver_central <- get_map(location="Denver", zoom=13, source="osm")
-denver_full <- get_map(location =
-                         c(fatality_df$LONGITUD, fatality_df$LATITUDE), zoom=12, source="osm")
+
+ggplot(fatality_df,aes(x=LONGITUD, y=LATITUDE))+
+  geom_point()
+
+
+
+
+USA <- get_map(location="United States of America", zoom=6, source="google")
+
+plot <-
+  geom_point(aes(x=fatality_df$LONGITUD, y=fatality_df$LATITUDE),
+             data=fatality_df, col="#ffff88", alpha=0.2, size=1)
+ggmap(USA)+plot
+
+
+US<-get_googlemap(location="United States", zoom = 10,
+              size = c(640, 640), scale = 2,maptype = "roadmap")
+
+
+DC<-filter(fatality_df,grepl('Dis',STATE))
+
+
+
+
+ggplot(fatality_df, aes(STATE, fill=GENDER)) + 
+  geom_bar(stat="identity") + 
+  coord_flip() 
+
+write_csv(fatality_df_V1,"C:/Users/Dereje/NSSDS/Testing/Traffic-Fatalities-in-the-US-2016/APP_test/fatality_df_V1.csv", na="NA")
 
