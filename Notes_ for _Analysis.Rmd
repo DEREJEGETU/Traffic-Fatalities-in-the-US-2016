@@ -55,7 +55,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Neighborhoods with the most accidents
 
   
-## The 2007-2016 FARS Auxiliary Datasets guide
+#2016 FARS Auxiliary Datasets guide
 
 ### Accident File 
  *ST_CASE is the unique case identifier for each record*

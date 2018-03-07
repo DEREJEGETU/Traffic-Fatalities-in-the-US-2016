@@ -6,21 +6,19 @@ setwd("C:/Users/Dereje/NSSDS/Testing/Traffic-Fatalities-in-the-US-2016")
 
 
 ## Loading Packages 
-
-library(shiny)
-library(shinythemes)
 library(readr)
 library(ggplot2)
 library(stringr)
 library(tidyverse)
+library(plyr)
 library(dplyr)
 library(magrittr)
 library(DT)
 library(tools)
 library(labelled)
-library(plyr)
 library(maps)
-
+library(ggmap)
+library(gridExtra)
 
 
 ## Importing Data Sets 
@@ -64,7 +62,7 @@ fatality_df<-person_2016 %>%
 
 
 # # Changing Numeric values in to character to map the codes , but later we will change them to factor as necessaary
-col_names<-c("STATE", "PER_TYP",  "SEX",  "REST_MIS", "DSTATUS" ,"REST_USE", "AIR_BAG" , "COUNTY" ,  "CITY",
+col_names<-c("STATE", "PER_TYP",  "SEX",  "REST_MIS", "DSTATUS" , "AIR_BAG" , "COUNTY" ,  "CITY",
               "NHS",  "RUR_URB" , "LGT_COND", "WEATHER1","WEATHER2", "WEATHER",  "CF1",      "CF2",      "CF3" ,    
 "DRUNK_DR", "FUNC_SYS", "MDRDSTRD" ,"UNITTYPE", "HIT_RUN" , "BODY_TYP", "MAKE",  "L_STATE", "L_STATUS", "DR_HGT" , 
 "DR_WGT",   "PREV_ACC", "PREV_SUS", "PREV_DWI", "PREV_SPD", "PREV_OTH", "SPEEDREL", "DR_SF1" ,  "DR_SF2", "DR_SF3" ,"DR_SF4" , 
@@ -112,12 +110,6 @@ fatality_df$REST_MIS<- factor(fatality_df$REST_MIS,
                           levels = c(0,1,8),
                           labels = c("No", "Yes", "Not a Motor Vehicle Occupant"))
 
-# Restraint Use 
-fatality_df$REST_USE<- factor(fatality_df$REST_USE,
-                              levels = c(0,1,2,3,4,5,8,9),
-                              labels = c("None", "Shoulder Belt", "Lap Belt","Lap and Shoulder Belt", "Child Safety Seat", 
-                                        "Motorcycle Helmet", "Type Unknown","Unknown"))
-
 # Nathional High way system
 fatality_df$NHS<- factor(fatality_df$NHS,
                               levels = c(0,1,9),
@@ -126,7 +118,7 @@ fatality_df$NHS<- factor(fatality_df$NHS,
 # Land Use Rural Urban 
 fatality_df$RUR_URB<- factor(fatality_df$RUR_URB,
                          levels = c(1,2,6,8,9),
-                         labels = c("Rural","URban","Trafficway Not in State Inventory","Not Reported", "Unknown"))
+                         labels = c("Rural","Urban","Trafficway Not in State Inventory","Not Reported", "Unknown"))
 # Light Condition
 fatality_df$LGT_COND<- factor(fatality_df$LGT_COND,
                              levels = c(1,2,3,4,5,6,7,8,9),
@@ -140,18 +132,6 @@ fatality_df$WEATHER<- factor(fatality_df$WEATHER,
                                          "Severe Crosswinds", "Blowing Sand_Soil_Dirt","Other","Cloudy","Blowing Snow",
                                          "Freezing Rain or Drizzle","Not Reported","Unknown"))
 
-
-fatality_df$WEATHER1<- factor(fatality_df$WEATHER1,
-                             levels = c(0,1,2,3,4,5,6,7,8,10,11,12,98,99),
-                             labels = c("No Additional Atmospheric Conditions","Clear","Rain","Sleet_Hail", "Snow", "Fog_Smog_Smoke",
-                                        "Severe Crosswinds", "Blowing Sand_Soil_Dirt","Other","Cloudy","Blowing Snow",
-                                        "Freezing Rain or Drizzle","Not Reported","Unknown"))
-
-fatality_df$WEATHER2<- factor(fatality_df$WEATHER2,
-                              levels = c(0,1,2,3,4,5,6,7,8,10,11,12,98,99),
-                              labels = c("No Additional Atmospheric Conditions","Clear","Rain","Sleet_Hail", "Snow", "Fog_Smog_Smoke",
-                                         "Severe Crosswinds", "Blowing Sand_Soil_Dirt","Other","Cloudy","Blowing Snow",
-                                         "Freezing Rain or Drizzle","Not Reported","Unknown"))
 #Road functional classification
 
 fatality_df$FUNC_SYS<- factor(fatality_df$FUNC_SYS,
@@ -271,7 +251,6 @@ fatality_df$MINUTE[fatality_df$MINUTE==99] <- NA
 
 
 # SPEED Related
-library(plyr)
 fatality_df$SPEED_INVOLVED <- revalue(fatality_df$SPEEDREL, c("No"="No", "Yes_Racing"="Yes","Yes, Exceeded Speed Limit"="Yes",
                                                               "Yes, Too Fast for Conditions"="Yes","Yes, Specifics Unknown"="Yes", 
                                                               "No Driver Present"="No Driver Present","Unknown"="Unknown"))
@@ -288,6 +267,7 @@ fatality_df$WEATHER_CONDITION<-revalue(fatality_df$WEATHER,c("Clear"="Clear","No
                                                              "Blowing Sand_Soil_Dirt"="Bad Weather","Other"="Bad Weather","Cloudy"="Bad Weather","Blowing Snow"="Bad Weather",
                                                              "Freezing Rain or Drizzle"="Bad Weather","Not Reported"="NA","Unknown"="Unknown"))
 
+
 fatality_df$DISTRACTED<-revalue(fatality_df$MDRDSTRD, c("Not Distracted"="Not Distracted","Unknown if Distracted"="Unknown",
                                                         "While Using or Reaching For Device/Object Brought Into Vehicle"="Other Distraction",
                                                         "Distraction (Distracted)Details Unknown"="Other Distraction","Other Cellular Phone Related"="Cellular Phone Related",
@@ -297,14 +277,23 @@ fatality_df$DISTRACTED<-revalue(fatality_df$MDRDSTRD, c("Not Distracted"="Not Di
                                                       "Distracted by Outside Person, Object or Event"="Other Distraction","Careless/Inattentive"="Other Distraction",
                                                       "Distraction/Inattention"="Other Distraction","Inattention (Inattentive), Details Unknown"="Other Distraction","While Talking or Listening to Cellular Phone"="Cellular Phone Related",
                                                       "While Using Other Component/Controls Integral to Vehicle"="Other Distraction","Lost In Thought/Day Dreaming"="Other Distraction",
-                                                     "Distraction/Careless"="Other Distraction","By a Moving Object in Vehicle"="Other Distraction", "No Driver Present/Unknown if Driver Present"="Other Distraction",
-                                                     "Other Distraction "="Other Distraction"))
+                                                     "Distraction/Careless"="Other Distraction","By a Moving Object in Vehicle"="Other Distraction", "No Driver Present/Unknown if Driver Present"="Other Distraction", " Other Distraction"="Other Distraction"
+                                                     ))
 
-fatality_df$long<-fatality_df$LONGITUD
 
-fatality_df$long[fatality_df$long==999.9999] <- NA
-fatality_df$long[fatality_df$long==888.88880] <- NA
-fatality_df$long[fatality_df$long==777.77770] <- NA
+
+
+
+
+x<-fatality_df %>% 
+  filter(fatality_df$DISTRACTED== " Other Distraction")
+
+
+fatality_df$lng<-fatality_df$LONGITUD
+
+fatality_df$lng[fatality_df$lng==999.9999] <- NA
+fatality_df$lng[fatality_df$lng==888.88880] <- NA
+fatality_df$lng[fatality_df$lng==777.77770] <- NA
 
 
 fatality_df$lat<-fatality_df$LATITUDE
@@ -320,10 +309,6 @@ fatality_df<-mutate(fatality_df, BMI=round(DR_WGT /(DR_HGT)**2 * 703))
 
 fatality_df<-fatality_df %>% 
   select(-c(PERSONS,LGT_COND,UNITTYPE,long,lat,MAKE,BODY_TYP))
-
-
-
-
 
 
 ggplot(fatality_df,aes(x=long, y=lat))+
@@ -410,30 +395,9 @@ ggplot(fatality_df) + geom_bar(aes(x=STATE, fill=AGE_GROUP)) +
   labs(title="Number of Accidents by Weather condition",
        x="Weather condition", y="Count")
 
-library(ggmap)
-library(gridExtra)
-
 
 ggplot(fatality_df,aes(x=LONGITUD, y=LATITUDE))+
   geom_point()
-
-
-
-
-USA <- get_map(location="United States of America", zoom=6, source="google")
-
-plot <-
-  geom_point(aes(x=fatality_df$LONGITUD, y=fatality_df$LATITUDE),
-             data=fatality_df, col="#ffff88", alpha=0.2, size=1)
-ggmap(USA)+plot
-
-
-US<-get_googlemap(location="United States", zoom = 10,
-              size = c(640, 640), scale = 2,maptype = "roadmap")
-
-
-DC<-filter(fatality_df,grepl('Dis',STATE))
-
 
 
 
@@ -441,5 +405,5 @@ ggplot(fatality_df, aes(STATE, fill=GENDER)) +
   geom_bar(stat="identity") + 
   coord_flip() 
 
-write_csv(fatality_df_V1,"C:/Users/Dereje/NSSDS/Testing/Traffic-Fatalities-in-the-US-2016/APP_test/fatality_df_V1.csv", na="NA")
+#write_csv(fatality_df_V1,"C:/Users/Dereje/NSSDS/Testing/Traffic-Fatalities-in-the-US-2016/APP_test/fatality_df_V1.csv", na="NA")
 
