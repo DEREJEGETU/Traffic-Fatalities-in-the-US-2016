@@ -1,0 +1,13 @@
+name: 2016_US_Traffic_Fatalities
+title: 2016_US_Traffic_Fatalities
+username:
+account: dereje-getu-demissie
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 296272
+bundleId: 1260264
+url: https://dereje-getu-demissie.shinyapps.io/2016_US_Traffic_Fatalities/
+when: 1520556592.66829
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: fatality_df_V1.csv

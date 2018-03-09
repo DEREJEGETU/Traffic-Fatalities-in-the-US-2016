@@ -1,0 +1,13 @@
+name: Shiny_App_dev
+title: Shiny_App_dev
+username:
+account: dereje-getu-demissie
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 296218
+bundleId: 1260254
+url: https://dereje-getu-demissie.shinyapps.io/Shiny_App_dev/
+when: 1520555780.53718
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: fatality_df_V1.csv
