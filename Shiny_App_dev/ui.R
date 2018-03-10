@@ -13,9 +13,6 @@ library(gridExtra)
 library(ggmap)
 library(rsconnect)
 
-
-
-
 #fatality_df_V1<-read.csv("./fatality_df_v1.csv")
 fluidPage(fluidRow(
   column(3
@@ -33,7 +30,10 @@ sidebarLayout(
    
     
     checkboxInput("plot1","Nation Wide Fatalities", value=T),
-    checkboxInput("plot2","Sate Wide Fatalities", value=F),
+    checkboxInput("plot2","State Wide Fatalities", value=F),
+    helpText("Note:Use Select State ",
+             "For State Wide Fatalities"),
+    hr(),
     selectInput(
       inputId ="causes",
       label="Select Features:",
@@ -48,9 +48,9 @@ sidebarLayout(
                   "License Status"="LICENSE_STATUS",
                   "Speed Involved"="SPEED_INVOLVED",
                   "Hit and Run"="HIT_RUN"),
-      selected="GENDER"
+      selected="STATE"
     ),
-    
+    hr(),
     selectInput(
       inputId = "color",
       label = "Color By:",
@@ -65,8 +65,12 @@ sidebarLayout(
                   "License Status"="LICENSE_STATUS",
                   "Speed Involved"="SPEED_INVOLVED",
                   "Hit and Run"="HIT_RUN"),
-      selected="AGE_GROUP"
+      selected="GENDER"
     ),
+    hr(),
+    helpText("Note:For Fatal Crashes by Time tab",
+             "Use Select Time and Color By"),
+    
     selectInput(
       inputId = "time",
       label = "Select Time:",
@@ -77,9 +81,7 @@ sidebarLayout(
       selected="HOUR"
     ),
     
-    br(),
-    br(),
-    
+    hr(),    
     #sliderInput(inputId = "alpha", 
     #label = "Alpha:", 
     # min = 0, max = 1, 
@@ -116,7 +118,6 @@ sidebarLayout(
                         ),
                         
                         tabPanel(title="Fatal Crashes by Time",
-                                 h5("Accidents Distribution by time for US"),
                                  plotOutput(outputId = "Histogram")),
                         
                         tabPanel(title = "Tennessee",

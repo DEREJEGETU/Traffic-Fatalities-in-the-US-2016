@@ -21,12 +21,14 @@ function(input, output) {
     a<-droplevels(a)
   })
   
+  
+  
   pt1<-reactive({
     if(!input$plot1) return(NULL)
     ggplot(data=fatality_df_V1,aes(
       x=fatality_df_V1[[input$causes]], 
       fill=fatality_df_V1[[input$color]]
-    )) + 
+    )) +
       geom_bar()+
       coord_flip()+
       labs(x = toTitleCase(paste(input$causes)),
@@ -125,9 +127,10 @@ function(input, output) {
                 NHTSA's Fatality Analysis Reporting System (FARS) provides data about fatal crashes involving all types of vehicles. FARS is a census of fatal motor 
                 vehicle crashes with a set of data files documenting all qualifying fatalities that occurred within the 50 States, the District of Columbia, 
                 and Puerto Rico since 1975. To qualify as a FARS case, the crash had to involve a motor vehicle traveling on a traffic way customarily open to the public,
-                and must have resulted in the death of a motorist or a non-motorist within 30 days of the crash. Please go to the 
-                (https://www.nhtsa.gov/research-data/fatality-analysis-reporting-system-fars) to access the data set.
-                "))
+                and must have resulted in the death of a motorist or a non-motorist within 30 days of the crash. Please go to 
+                (https://www.nhtsa.gov/research-data/fatality-analysis-reporting-system-fars) to access the data set."
+                ))
+        
   })
   }
 

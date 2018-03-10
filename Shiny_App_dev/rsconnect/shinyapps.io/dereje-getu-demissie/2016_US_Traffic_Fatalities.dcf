@@ -5,9 +5,9 @@ account: dereje-getu-demissie
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 296272
-bundleId: 1260264
+bundleId: 1262345
 url: https://dereje-getu-demissie.shinyapps.io/2016_US_Traffic_Fatalities/
-when: 1520556592.66829
+when: 1520688566.3275
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: fatality_df_V1.csv
+ignoredFiles: fatality_df_V1.csv|test/app.R
